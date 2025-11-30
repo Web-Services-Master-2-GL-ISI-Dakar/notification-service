@@ -1,0 +1,182 @@
+/**
+* MODÈLE DE DONNÉES POUR LE MICROSERVICE DE NOTIFICATIONS
+* Ce fichier JDL définit toutes les entités et leurs relations
+*/
+
+// ===============================================
+// ENTITÉ PRINCIPALE : NOTIFICATION
+// ===============================================
+entity Notification {
+  id Long required
+  userId String required           // ID de l'utilisateur
+  accountNumber String             // Numéro de compte (optionnel)
+  type NotificationType required   // Type de notification
+  channel NotificationChannel required  // Canal utilisé
+  title String required            // Titre de la notification
+  message String required maxlength(1000)  // Message
+  recipient String required        // Destinataire (téléphone/email/token)
+  status NotificationStatus required  // Statut actuel
+  errorMessage String              // Message d'erreur si échec
+  retryCount Integer               // Nombre de tentatives
+  createdAt Instant required       // Date de création
+  sentAt Instant                   // Date d'envoi
+  metadata String                  // Données additionnelles (JSON)
+}
+
+// ===============================================
+// ENTITÉ : TEMPLATE DE NOTIFICATION
+// ===============================================
+entity NotificationTemplate {
+  id Long required
+  templateCode String required unique  // Code unique du template
+  type NotificationType required   // Type de notification
+  language String required         // Langue (fr, en, wo)
+  subject String required          // Sujet (pour email)
+  bodyTemplate String required maxlength(5000)  // Template du corps
+  smsTemplate String maxlength(500)  // Template SMS
+  pushTitle String                 // Titre pour push
+  pushBody String                  // Corps pour push
+  active Boolean required          // Actif ou non
+  createdAt Instant required
+  updatedAt Instant
+}
+
+// ===============================================
+// ENTITÉ : LOG DES NOTIFICATIONS
+// ===============================================
+entity NotificationLog {
+  id Long required
+  notificationId Long required     // Référence à la notification
+  userId String required
+  type NotificationType required
+  channel NotificationChannel required
+  status NotificationStatus required
+  message String
+  recipient String
+  timestamp Instant required
+  sentAt Instant
+  retryCount Integer
+  channelResults String            // Résultats par canal (JSON)
+  action String                    // Action effectuée
+  details String                   // Détails supplémentaires
+}
+
+// ===============================================
+// ENTITÉ : PRÉFÉRENCES UTILISATEUR
+// ===============================================
+entity NotificationPreference {
+  id Long required
+  userId String required unique    // Un seul enregistrement par utilisateur
+  smsEnabled Boolean required      // SMS activé
+  emailEnabled Boolean required    // Email activé
+  pushEnabled Boolean required     // Push activé
+  mutedTypes String                // Types mutés (JSON array)
+  language String required         // Langue préférée
+  updatedAt Instant
+}
+
+// ===============================================
+// ENTITÉ : ÉVÉNEMENT TRANSACTION (depuis Kafka)
+// ===============================================
+entity TransactionEvent {
+  id Long required
+  transactionId String required
+  senderAccount String required
+  receiverAccount String required
+  amount BigDecimal required
+  type TransactionType required
+  timestamp Instant required
+  additionalData String            // Données supplémentaires (JSON)
+}
+
+// ===============================================
+// ENTITÉ : PROFIL UTILISATEUR
+// ===============================================
+entity UserProfile {
+  userId String required unique
+  phoneNumber String
+  email String
+  deviceToken String               // Token FCM pour push
+  phoneVerified Boolean required
+  emailVerified Boolean required
+}
+
+// ===============================================
+// ENTITÉ : REQUÊTE DE NOTIFICATION
+// ===============================================
+entity NotificationRequest {
+  id Long required
+  userId String required
+  accountNumber String
+  type NotificationType required
+  channels String required         // Liste des canaux (JSON)
+  data String                      // Données pour le template (JSON)
+  priority Priority required
+  immediate Boolean required       // Envoyer immédiatement
+}
+
+// ===============================================
+// ÉNUMÉRATIONS
+// ===============================================
+
+enum NotificationType {
+  TRANSACTION_SENT
+  TRANSACTION_RECEIVED
+  ACCOUNT_CREATED
+  PASSWORD_RESET
+  LOW_BALANCE
+  FAILED_TRANSACTION
+  SECURITY_ALERT
+}
+
+enum NotificationChannel {
+  SMS
+  EMAIL
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  RETRY
+  CANCELLED
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TransactionType {
+  SEND
+  RECEIVE
+  WITHDRAWAL
+  DEPOSIT
+}
+
+// ===============================================
+// RELATIONS
+// ===============================================
+
+// Une notification peut avoir plusieurs logs
+relationship OneToMany {
+  Notification to NotificationLog{notification}
+}
+
+// ===============================================
+// OPTIONS DE GÉNÉRATION
+// ===============================================
+
+// Générer des services pour toutes les entités
+service all with serviceImpl
+
+// Ajouter la pagination
+paginate all with pagination
+
+// Générer des DTOs avec MapStruct
+dto all with mapstruct
+
+// Ajouter les filtres JPA pour certaines entités
+filter Notification, NotificationLog, NotificationPreference

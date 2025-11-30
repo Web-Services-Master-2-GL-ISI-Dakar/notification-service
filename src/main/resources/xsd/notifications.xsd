@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://ondmoney.sn/notification/schemas"
+           targetNamespace="http://ondmoney.sn/notification/schemas"
+           elementFormDefault="qualified">
+
+  <!-- ============================================ -->
+  <!-- TYPES ÉNUMÉRÉS (ENUMS)                       -->
+  <!-- ============================================ -->
+
+  <xs:simpleType name="NotificationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TRANSACTION_SENT"/>
+      <xs:enumeration value="TRANSACTION_RECEIVED"/>
+      <xs:enumeration value="ACCOUNT_CREATED"/>
+      <xs:enumeration value="PASSWORD_RESET"/>
+      <xs:enumeration value="LOW_BALANCE"/>
+      <xs:enumeration value="FAILED_TRANSACTION"/>
+      <xs:enumeration value="SECURITY_ALERT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NotificationChannel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SMS"/>
+      <xs:enumeration value="EMAIL"/>
+      <xs:enumeration value="PUSH"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NotificationStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PENDING"/>
+      <xs:enumeration value="SENT"/>
+      <xs:enumeration value="FAILED"/>
+      <xs:enumeration value="RETRY"/>
+      <xs:enumeration value="CANCELLED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Priority">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="HIGH"/>
+      <xs:enumeration value="MEDIUM"/>
+      <xs:enumeration value="LOW"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ============================================ -->
+  <!-- TYPES COMPLEXES (STRUCTURES DE DONNÉES)      -->
+  <!-- ============================================ -->
+
+  <!-- Requête pour envoyer une notification -->
+  <xs:complexType name="SendNotificationRequestType">
+    <xs:sequence>
+      <xs:element name="userId" type="xs:string"/>
+      <xs:element name="accountNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="tns:NotificationType"/>
+      <xs:element name="channels" type="tns:NotificationChannel" maxOccurs="unbounded"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="message" type="xs:string"/>
+      <xs:element name="priority" type="tns:Priority"/>
+      <xs:element name="immediate" type="xs:boolean"/>
+      <xs:element name="metadata" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Réponse après envoi de notification -->
+  <xs:complexType name="SendNotificationResponseType">
+    <xs:sequence>
+      <xs:element name="notificationId" type="xs:long"/>
+      <xs:element name="status" type="tns:NotificationStatus"/>
+      <xs:element name="message" type="xs:string"/>
+      <xs:element name="timestamp" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Requête pour vérifier le statut -->
+  <xs:complexType name="GetNotificationStatusRequestType">
+    <xs:sequence>
+      <xs:element name="notificationId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Réponse avec le statut -->
+  <xs:complexType name="GetNotificationStatusResponseType">
+    <xs:sequence>
+      <xs:element name="notificationId" type="xs:long"/>
+      <xs:element name="userId" type="xs:string"/>
+      <xs:element name="type" type="tns:NotificationType"/>
+      <xs:element name="status" type="tns:NotificationStatus"/>
+      <xs:element name="sentAt" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="errorMessage" type="xs:string" minOccurs="0"/>
+      <xs:element name="retryCount" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Requête pour les préférences utilisateur -->
+  <xs:complexType name="GetUserPreferenceRequestType">
+    <xs:sequence>
+      <xs:element name="userId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Réponse avec les préférences -->
+  <xs:complexType name="GetUserPreferenceResponseType">
+    <xs:sequence>
+      <xs:element name="userId" type="xs:string"/>
+      <xs:element name="smsEnabled" type="xs:boolean"/>
+      <xs:element name="emailEnabled" type="xs:boolean"/>
+      <xs:element name="pushEnabled" type="xs:boolean"/>
+      <xs:element name="language" type="xs:string"/>
+      <xs:element name="mutedTypes" type="tns:NotificationType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Requête pour mettre à jour les préférences -->
+  <xs:complexType name="UpdateUserPreferenceRequestType">
+    <xs:sequence>
+      <xs:element name="userId" type="xs:string"/>
+      <xs:element name="smsEnabled" type="xs:boolean"/>
+      <xs:element name="emailEnabled" type="xs:boolean"/>
+      <xs:element name="pushEnabled" type="xs:boolean"/>
+      <xs:element name="mutedTypes" type="tns:NotificationType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Réponse après mise à jour -->
+  <xs:complexType name="UpdateUserPreferenceResponseType">
+    <xs:sequence>
+      <xs:element name="success" type="xs:boolean"/>
+      <xs:element name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ============================================ -->
+  <!-- ÉLÉMENTS POUR LES OPÉRATIONS SOAP            -->
+  <!-- ============================================ -->
+
+  <!-- Opération : Envoyer une notification -->
+  <xs:element name="SendNotificationRequest" type="tns:SendNotificationRequestType"/>
+  <xs:element name="SendNotificationResponse" type="tns:SendNotificationResponseType"/>
+
+  <!-- Opération : Vérifier le statut -->
+  <xs:element name="GetNotificationStatusRequest" type="tns:GetNotificationStatusRequestType"/>
+  <xs:element name="GetNotificationStatusResponse" type="tns:GetNotificationStatusResponseType"/>
+
+  <!-- Opération : Récupérer les préférences -->
+  <xs:element name="GetUserPreferenceRequest" type="tns:GetUserPreferenceRequestType"/>
+  <xs:element name="GetUserPreferenceResponse" type="tns:GetUserPreferenceResponseType"/>
+
+  <!-- Opération : Mettre à jour les préférences -->
+  <xs:element name="UpdateUserPreferenceRequest" type="tns:UpdateUserPreferenceRequestType"/>
+  <xs:element name="UpdateUserPreferenceResponse" type="tns:UpdateUserPreferenceResponseType"/>
+
+</xs:schema>

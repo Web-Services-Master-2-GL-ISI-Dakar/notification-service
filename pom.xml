@@ -89,7 +89,31 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
+      <!-- Spring Boot Web Services (SOAP) -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web-services</artifactId>
+      </dependency>
+
+      <!-- WSDL Generation -->
+      <dependency>
+        <groupId>wsdl4j</groupId>
+        <artifactId>wsdl4j</artifactId>
+      </dependency>
+
+      <!-- JAXB pour Java 11+ -->
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.3.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>2.3.1</version>
+      </dependency>
+      <dependency>
             <groupId>tech.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
             <version>${jhipster-framework.version}</version>
@@ -97,6 +121,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>3.6.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -106,10 +131,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -228,11 +249,6 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
         </dependency>
@@ -336,6 +352,108 @@
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR FIREBASE (Push Notifications) -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>com.google.firebase</groupId>
+        <artifactId>firebase-admin</artifactId>
+        <version>9.2.0</version>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR KAFKA ADDITIONNELLES -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>org.springframework.kafka</groupId>
+        <artifactId>spring-kafka</artifactId>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.kafka</groupId>
+        <artifactId>spring-kafka-test</artifactId>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR ASYNC ET SCHEDULING -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-aop</artifactId>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR HTTP CLIENT (RestTemplate/WebClient) -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES UTILITAIRES -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+      </dependency>
+
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20231013</version>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR VALIDATION -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>jakarta.validation</groupId>
+        <artifactId>jakarta.validation-api</artifactId>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR CACHE (Optionnel mais recommandé) -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-cache</artifactId>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR RATE LIMITING (Optionnel) -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>com.bucket4j</groupId>
+        <artifactId>bucket4j-core</artifactId>
+        <version>8.7.0</version>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR TEMPLATING (Thymeleaf déjà présent, mais ajout FreeMarker) -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-freemarker</artifactId>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR MONITORING AVANCÉ (Optionnel) -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-core</artifactId>
+      </dependency>
+
+      <!-- ===================================================================== -->
+      <!-- DÉPENDANCES POUR LOMBOK (Simplifie le code) -->
+      <!-- ===================================================================== -->
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+      </dependency>
     </dependencies>
 
     <build>
@@ -356,10 +474,31 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jaxb2-maven-plugin</artifactId>
+            <version>2.5.0</version>
+            <executions>
+              <execution>
+                <id>xjc</id>
+                <goals>
+                  <goal>xjc</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/src/main/resources/xsd</source>
+              </sources>
+              <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
+              <clearOutputDir>false</clearOutputDir>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>${maven-checkstyle-plugin.version}</version>
+          </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -384,10 +523,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
@@ -419,36 +555,43 @@
         </plugins>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${maven-checkstyle-plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>${checkstyle.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.spring.nohttp</groupId>
-                            <artifactId>nohttp-checkstyle</artifactId>
-                            <version>${nohttp-checkstyle.version}</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <configLocation>checkstyle.xml</configLocation>
-                        <includes>pom.xml,README.md</includes>
-                        <excludes>.git/**/*,target/**/*,node_modules/**/*</excludes>
-                        <sourceDirectories>./</sourceDirectories>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                  <source>${java.version}</source>
+                  <target>${java.version}</target>
+                  <parameters>true</parameters>
+                  <annotationProcessorPaths>
+                    <path>
+                      <groupId>org.projectlombok</groupId>
+                      <artifactId>lombok</artifactId>
+                      <version>1.18.32</version>
+                    </path>
+                    <path>
+                      <groupId>org.springframework.boot</groupId>
+                      <artifactId>spring-boot-configuration-processor</artifactId>
+                      <version>${spring-boot.version}</version>
+                    </path>
+                    <path>
+                      <groupId>org.mapstruct</groupId>
+                      <artifactId>mapstruct-processor</artifactId>
+                      <version>${mapstruct.version}</version>
+                    </path>
+                    <path>
+                      <groupId>org.hibernate.orm</groupId>
+                      <artifactId>hibernate-jpamodelgen</artifactId>
+                      <version>6.6.13.Final</version>
+                    </path>
+                    <path>
+                      <groupId>org.glassfish.jaxb</groupId>
+                      <artifactId>jaxb-runtime</artifactId>
+                      <version>2.3.1</version>
+                    </path>
+                  </annotationProcessorPaths>
+                </configuration>
+              </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>

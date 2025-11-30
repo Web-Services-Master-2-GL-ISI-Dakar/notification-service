@@ -12,7 +12,15 @@
     <property name="timeType" value="time(6)" dbms="postgresql"/>
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251125133347_added_entity_Notification.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251125133348_added_entity_NotificationTemplate.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251125133349_added_entity_NotificationLog.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251125133350_added_entity_NotificationPreference.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251125133351_added_entity_TransactionEvent.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251125133352_added_entity_UserProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251125133353_added_entity_NotificationRequest.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20251125133349_added_entity_constraints_NotificationLog.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
