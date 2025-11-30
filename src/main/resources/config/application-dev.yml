@@ -19,6 +19,9 @@ logging:
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
     sn.ondmoney.notificationservice: DEBUG
+    org.springframework.ws: DEBUG
+    org.apache.kafka: INFO
+    org.springframework.kafka: DEBUG
 
 eureka:
   instance:
@@ -34,6 +37,10 @@ management:
   tracing:
     sampling:
       probability: 1.0 # report 100% of traces
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
 
 spring:
   devtools:
@@ -53,6 +60,10 @@ spring:
       profile: dev
       label: main # toggle to switch to a different version of the configuration as stored in git
       # it can be set to any label, branch or commit of the configuration source Git repository
+
+  # ===================================================================
+  # Database Configuration
+  # ===================================================================
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://localhost:5432/ondmoneyNotificationService
@@ -61,13 +72,69 @@ spring:
     hikari:
       poolName: Hikari
       auto-commit: false
+      maximum-pool-size: 10
+      connection-timeout: 30000
+
+  jpa:
+    database-platform: tech.jhipster.domain.util.FixedPostgreSQL10Dialect
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.jdbc.batch_size: 20
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
+
+  # ===================================================================
+  # Kafka Configuration
+  # ===================================================================
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+        spring.json.type.mapping: transactionEvent:sn.ondmoney.notificationservice.service.dto.TransactionEventDTO,accountEvent:sn.ondmoney.notificationservice.service.dto.AccountEventDTO,securityEvent:sn.ondmoney.notificationservice.service.dto.SecurityEventDTO
+      enable-auto-commit: false
+      max-poll-records: 10
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+    listener:
+      ack-mode: manual
+      concurrency: 3
+
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
+
   thymeleaf:
     cache: false
+
+  # ===================================================================
+  # Mail Configuration (pour les notifications email)
+  # ===================================================================
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    protocol: smtp
+    tls: false
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+    from: notificationservice@localhost
 
 server:
   port: 8081
@@ -85,13 +152,14 @@ jhipster:
     password: admin
   # CORS is disabled by default on microservices, as you should access them through a gateway.
   # If you want to enable it, please uncomment the configuration below.
-  # cors:
-  #   allowed-origins: "http://localhost:9000,https://localhost:9000"
-  #   allowed-methods: "*"
-  #   allowed-headers: "*"
-  #   exposed-headers: "Authorization,Link,X-Total-Count"
-  #   allow-credentials: true
-  #   max-age: 1800
+  cors:
+    allowed-origins: 'http://localhost:9000,https://localhost:9000,http://localhost:4200,https://localhost:4200'
+    allowed-methods: '*'
+    allowed-headers: '*'
+    exposed-headers: 'Authorization,Link,X-Total-Count,X-Total-Pages'
+    allow-credentials: true
+    max-age: 1800
+
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
@@ -99,6 +167,7 @@ jhipster:
       host: localhost
       port: 5000
       ring-buffer-size: 512
+
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class
@@ -108,4 +177,152 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  # ===================================================================
+  # Configuration SOAP
+  # ===================================================================
+  soap:
+    endpoint-url: /ws
+    wsdl-location: /ws/notifications.wsdl
+    namespace: http://ondmoney.sn/notification/schemas
+    service-name: NotificationService
+
+  # ===================================================================
+  # Configuration des Topics Kafka
+  # ===================================================================
+  kafka:
+    topics:
+      transactions: transactions
+      accounts: accounts
+      security-events: security-events
+      notifications: notifications
+      dead-letter: notifications-dlq
+
+  # ===================================================================
+  # Configuration des canaux de notification
+  # ===================================================================
+  notification:
+    # Configuration SMS
+    sms:
+      provider: lafricamobile
+      # URL de l'API LAMPUSH
+      api-url: https://lamsms.lafricamobile.com/api
+      account-id: ISI_01
+      password: oDouBDLiUuz2dLR
+      sender-id: ONDMONEY
+      enabled: true
+      max-retries: 3
+      retry-delay-seconds: 60
+
+  external-services:
+    lafricamobile:
+      mock-enabled: true # Activer le mock en dev
+      mock-delay-ms: 1000
+
+    # Configuration Email
+    email:
+      enabled: true
+      from-address: noreply@ondmoney.sn
+      from-name: OndMoney Notifications
+      max-retries: 3
+      retry-delay-seconds: 60
+      templates-path: classpath:/templates/email/
+
+    # Configuration Push Notifications
+    push:
+      provider: firebase # ou 'fcm'
+      enabled: true
+      firebase:
+        credentials-path: classpath:/firebase/serviceAccountKey.json
+        project-id: ondmoney-notifications
+      max-retries: 3
+      retry-delay-seconds: 60
+
+    # Configuration générale
+    retry:
+      max-attempts: 5
+      backoff-delay: 5000 # milliseconds
+      backoff-multiplier: 2
+
+    queue:
+      enabled: true
+      batch-size: 50
+      polling-interval-seconds: 10
+
+    # Limitation de débit (rate limiting)
+    rate-limit:
+      enabled: true
+      sms-per-user-per-minute: 5
+      email-per-user-per-minute: 10
+      push-per-user-per-minute: 20
+
+  # ===================================================================
+  # Configuration des templates
+  # ===================================================================
+  templates:
+    default-language: fr
+    supported-languages: fr,en,wo
+    cache-enabled: true
+    cache-ttl-minutes: 60
+
+  # ===================================================================
+  # Configuration de sécurité
+  # ===================================================================
+  security:
+    soap:
+      enabled: false # Activer pour production avec authentification
+      username: admin
+      password: changeme
+
+    api:
+      key-required: false # Activer pour production
+      valid-keys:
+        - transaction-service-key
+        - gateway-service-key
+
+  # ===================================================================
+  # Configuration des métriques et monitoring
+  # ===================================================================
+  monitoring:
+    metrics:
+      enabled: true
+      export-interval-seconds: 60
+
+    alerts:
+      enabled: true
+      high-failure-rate-threshold: 0.1 # 10%
+      slow-notification-threshold-seconds: 30
+
+  # ===================================================================
+  # Configuration de la persistence
+  # ===================================================================
+  persistence:
+    notification-log:
+      retention-days: 90
+      cleanup-enabled: true
+      cleanup-cron: '0 0 2 * * ?' # Tous les jours à 2h du matin
+
+    archive:
+      enabled: true
+      older-than-days: 30
+      storage-path: /var/ondmoney/archives/notifications
+
+# ===================================================================
+# Configuration pour les tests et le développement
+# ===================================================================
+debug: false
+
+# ===================================================================
+# Configuration des outils externes (dev only)
+# ===================================================================
+external-services:
+  lafrica:
+    mock-enabled: true # Activer le mock en dev pour éviter les vrais envois
+    mock-delay-ms: 1000
+
+  firebase:
+    mock-enabled: true
+    mock-delay-ms: 500
+
+  smtp:
+    mock-enabled: false # MailDev en local
