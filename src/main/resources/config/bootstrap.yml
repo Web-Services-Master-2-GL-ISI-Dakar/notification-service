@@ -28,4 +28,4 @@ spring:
     compose:
       enabled: true
       lifecycle-management: start-only
-      file: src/main/docker/postgresql.yml
+      file: src/main/docker/mongodb.yml

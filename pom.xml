@@ -3,7 +3,7 @@
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>sn.ondmoney.notificationservice</groupId>
+    <groupId>sn.ondmoney.notification</groupId>
     <artifactId>ondmoney-notification-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -29,7 +29,7 @@
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <start-class>sn.ondmoney.notificationservice.OndmoneyNotificationServiceApp</start-class>
+        <start-class>sn.ondmoney.notification.OndmoneyNotificationServiceApp</start-class>
         <argLine>-Djava.security.egd=file:/dev/./urandom -Xmx1G</argLine>
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
         <run.addResources>false</run.addResources>
@@ -44,9 +44,6 @@
         <jib-maven-plugin.image>eclipse-temurin:17-jre-focal</jib-maven-plugin.image>
         <jib-maven-plugin.version>3.4.5</jib-maven-plugin.version>
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-        <liquibase-plugin.password/>
-        <liquibase-plugin.url/>
-        <liquibase-plugin.username/>
         <mapstruct.version>1.6.3</mapstruct.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
         <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
@@ -60,14 +57,15 @@
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
         <modernizer-maven-plugin.version>3.1.0</modernizer-maven-plugin.version>
+        <mongock-bom.version>5.5.1</mongock-bom.version>
         <nohttp-checkstyle.version>0.0.11</nohttp-checkstyle.version>
         <openapi-generator-maven-plugin.version>7.13.0</openapi-generator-maven-plugin.version>
         <profile.api-docs/>
         <profile.e2e/>
-        <profile.no-liquibase/>
         <profile.test/>
         <profile.tls/>
         <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
+        <redisson.version>3.46.0</redisson.version>
         <resource.delimiter>@</resource.delimiter>
         <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
         <spotless-maven-plugin.version>2.44.4</spotless-maven-plugin.version>
@@ -82,6 +80,13 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.mongock</groupId>
+                <artifactId>mongock-bom</artifactId>
+                <version>${mongock-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -113,7 +118,15 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -165,10 +178,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
@@ -179,19 +188,11 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate6</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hppc</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -212,12 +213,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus-simpleclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.mongock</groupId>
+            <artifactId>mongock-springboot-v3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.mongock</groupId>
+            <artifactId>mongodb-springdata-v4-driver</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
@@ -228,27 +233,9 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -267,8 +254,9 @@
             <version>${jackson-databind-nullable.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>${redisson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -313,7 +301,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>jdbc</artifactId>
+            <artifactId>elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -328,7 +316,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>mongodb</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -471,14 +459,6 @@
                                 <groupId>org.mapstruct</groupId>
                                 <artifactId>mapstruct-processor</artifactId>
                                 <version>${mapstruct.version}</version>
-                            </path>
-                            <path>
-                                <groupId>org.hibernate.orm</groupId>
-                                <artifactId>hibernate-jpamodelgen</artifactId>
-                            </path>
-                            <path>
-                                <groupId>org.glassfish.jaxb</groupId>
-                                <artifactId>jaxb-runtime</artifactId>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
@@ -796,47 +776,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.liquibase</groupId>
-                    <artifactId>liquibase-maven-plugin</artifactId>
-                    <version>${liquibase.version}</version>
-                    <configuration>
-                        <changeLogFile>config/liquibase/master.xml</changeLogFile>
-                        <diffChangeLogFile>${project.basedir}/src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
-                        <driver>org.postgresql.Driver</driver>
-                        <url>${liquibase-plugin.url}</url>
-                        <defaultSchemaName/>
-                        <username>${liquibase-plugin.username}</username>
-                        <password>${liquibase-plugin.password}</password>
-                        <referenceUrl>hibernate:spring:sn.ondmoney.notificationservice.domain?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
-                        <verbose>true</verbose>
-                        <logging>debug</logging>
-                        <contexts>!test</contexts>
-                        <diffExcludeObjects>oauth_access_token, oauth_approvals, oauth_client_details, oauth_client_token, oauth_code, oauth_refresh_token</diffExcludeObjects>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.liquibase</groupId>
-                            <artifactId>liquibase-core</artifactId>
-                            <version>${liquibase.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.liquibase.ext</groupId>
-                            <artifactId>liquibase-hibernate6</artifactId>
-                            <version>${liquibase.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>jakarta.validation</groupId>
-                            <artifactId>jakarta.validation-api</artifactId>
-                            <version>${jakarta-validation.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-data-jpa</artifactId>
-                            <version>${spring-boot.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
                     <groupId>org.openapitools</groupId>
                     <artifactId>openapi-generator-maven-plugin</artifactId>
                     <version>${openapi-generator-maven-plugin.version}</version>
@@ -848,8 +787,8 @@
                             <configuration>
                                 <inputSpec>${project.basedir}/src/main/resources/swagger/api.yml</inputSpec>
                                 <generatorName>spring</generatorName>
-                                <apiPackage>sn.ondmoney.notificationservice.web.api</apiPackage>
-                                <modelPackage>sn.ondmoney.notificationservice.service.api.dto</modelPackage>
+                                <apiPackage>sn.ondmoney.notification.web.api</apiPackage>
+                                <modelPackage>sn.ondmoney.notification.service.api.dto</modelPackage>
                                 <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
                                 <skipValidateSpec>false</skipValidateSpec>
                                 <configOptions>
@@ -884,11 +823,8 @@
             </activation>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/ondmoneyNotificationService</liquibase-plugin.url>
-                <liquibase-plugin.username>ondmoneyNotificationService</liquibase-plugin.username>
                 <profile.test>test,testdev</profile.test>
-                <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
+                <spring.profiles.active>dev${profile.tls}</spring.profiles.active>
             </properties>
             <dependencies>
                 <dependency>
@@ -984,10 +920,6 @@
             <id>IDE</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.hibernate.orm</groupId>
-                    <artifactId>hibernate-jpamodelgen</artifactId>
-                </dependency>
-                <dependency>
                     <groupId>org.mapstruct</groupId>
                     <artifactId>mapstruct-processor</artifactId>
                     <version>${mapstruct.version}</version>
@@ -995,20 +927,11 @@
             </dependencies>
         </profile>
         <profile>
-            <id>no-liquibase</id>
-            <properties>
-                <profile.no-liquibase>,no-liquibase</profile.no-liquibase>
-            </properties>
-        </profile>
-        <profile>
             <id>prod</id>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/ondmoneyNotificationService</liquibase-plugin.url>
-                <liquibase-plugin.username>ondmoneyNotificationService</liquibase-plugin.username>
                 <profile.test>test,testprod</profile.test>
-                <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>
+                <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}</spring.profiles.active>
             </properties>
             <build>
                 <plugins>

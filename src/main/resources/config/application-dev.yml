@@ -18,7 +18,7 @@ logging:
     ROOT: DEBUG
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
-    sn.ondmoney.notificationservice: DEBUG
+    sn.ondmoney.notification: DEBUG
 
 eureka:
   instance:
@@ -28,6 +28,9 @@ eureka:
       defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
 
 management:
+  health:
+    elasticsearch:
+      enabled: false
   zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
@@ -53,17 +56,11 @@ spring:
       profile: dev
       label: main # toggle to switch to a different version of the configuration as stored in git
       # it can be set to any label, branch or commit of the configuration source Git repository
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/ondmoneyNotificationService
-    username: ondmoneyNotificationService
-    password:
-    hikari:
-      poolName: Hikari
-      auto-commit: false
-  liquibase:
-    # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ondmoneyNotificationService
+  elasticsearch:
+    uris: http://localhost:9200
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
@@ -81,6 +78,13 @@ server:
 # ===================================================================
 
 jhipster:
+  cache: # Cache configuration
+    redis: # Redis configuration
+      expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
+      server: redis://localhost:6379
+      cluster: false
+      # server: redis://localhost:6379,redis://localhost:16379,redis://localhost:26379
+      # cluster: true
   registry:
     password: admin
   # CORS is disabled by default on microservices, as you should access them through a gateway.

@@ -20,6 +20,15 @@ eureka:
     appname: ondmoneyNotificationService
     instanceId: ondmoneyNotificationService:${spring.application.instance-id:${random.value}}
 
+mongock:
+  migration-scan-package:
+    - sn.ondmoney.notification.config.dbmigrations
+  mongo-db:
+    read-concern: local
+    write-concern:
+      journal: false
+      w: 'majority'
+
 spring:
   application:
     name: ondmoneyNotificationService
@@ -44,9 +53,6 @@ spring:
         kafkaProducer-out-0:
           content-type: text/plain
           group: ondmoney-notification-service
-  # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
-  liquibase:
-    contexts: test
   jackson:
     serialization:
       write-durations-as-timestamps: false

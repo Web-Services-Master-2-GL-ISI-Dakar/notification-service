@@ -1,14 +1,22 @@
 # This configuration is intended for development purpose, it's **your** responsibility to harden it for production
 name: ondmoneynotificationservice
 services:
-  postgresql:
+  mongodb:
     extends:
-      file: ./postgresql.yml
-      service: postgresql
+      file: ./mongodb.yml
+      service: mongodb
+  elasticsearch:
+    extends:
+      file: ./elasticsearch.yml
+      service: elasticsearch
   keycloak:
     extends:
       file: ./keycloak.yml
       service: keycloak
+  redis:
+    extends:
+      file: ./redis.yml
+      service: redis
   jhipster-registry:
     extends:
       file: ./jhipster-registry.yml
