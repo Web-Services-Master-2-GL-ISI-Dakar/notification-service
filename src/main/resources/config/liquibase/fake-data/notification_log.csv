@@ -1,0 +1,11 @@
+id;notification_id;user_id;type;channel;status;message;recipient;timestamp;sent_at;retry_count;channel_results;action;details
+1;18414;turbulent gee yahoo;LOW_BALANCE;PUSH;FAILED;lavish modulo;shimmering yowza upright;2025-11-25T04:13:58;2025-11-25T09:12:11;25023;granular;around;unless gah ack
+2;8083;aw meh;SECURITY_ALERT;EMAIL;CANCELLED;cutlet limply;excepting;2025-11-24T21:18:18;2025-11-24T17:09:27;3727;meanwhile lest seemingly;word;above
+3;1310;plus nicely;TRANSACTION_SENT;EMAIL;PENDING;confusion near contradict;gulp;2025-11-25T12:16:36;2025-11-25T09:03:56;16559;wear rue;upset rough;shabby furthermore
+4;26068;release creative;TRANSACTION_SENT;EMAIL;FAILED;what;christen;2025-11-24T16:35:03;2025-11-25T10:19:11;31503;cheerfully for conjecture;from while;nutritious
+5;6924;whitewash;TRANSACTION_SENT;SMS;CANCELLED;chairperson;inconsequential colorfully;2025-11-25T08:51:13;2025-11-24T21:21:33;5191;homeschool deed gee;boulevard radiant;lest vast
+6;3173;blah yawningly;ACCOUNT_CREATED;SMS;SENT;phew down sorrowful;serialize shimmering;2025-11-25T05:39:56;2025-11-25T04:49:03;3991;after nectarine proofread;whoever;indeed because
+7;24963;lovingly;ACCOUNT_CREATED;SMS;RETRY;indeed;strictly;2025-11-25T04:36:46;2025-11-25T03:46:39;27089;ugh prohibition;on tame;hmph
+8;2724;cruelty;FAILED_TRANSACTION;SMS;CANCELLED;management pish upon;gleefully once;2025-11-25T07:45:39;2025-11-24T16:42:09;18301;aboard;beneath;thump afterwards
+9;31944;highly fiercely;FAILED_TRANSACTION;EMAIL;FAILED;ouch;on phew;2025-11-24T23:43:47;2025-11-25T12:09:55;6713;dim;svelte calmly;memorise
+10;9947;incidentally;PASSWORD_RESET;SMS;CANCELLED;replacement;shadowy;2025-11-24T20:23:42;2025-11-25T09:07:01;20145;achieve;ah;badly

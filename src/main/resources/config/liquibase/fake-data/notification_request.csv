@@ -1,0 +1,11 @@
+id;user_id;account_number;type;channels;data;priority;immediate
+1;portly;somber;TRANSACTION_RECEIVED;slipper kookily slime;than inasmuch nor;LOW;false
+2;memorise by when;scram than;LOW_BALANCE;than aha chap;warmly for unlined;HIGH;false
+3;outside frantically howl;wisecrack window wide;SECURITY_ALERT;cannibalise gym other;how;MEDIUM;false
+4;sympathetically unwilling slather;midwife graffiti until;TRANSACTION_SENT;parody furthermore;zowie;HIGH;true
+5;funny outrun;up;PASSWORD_RESET;huzzah yahoo failing;whoa gurn ha;MEDIUM;true
+6;brr unless;programme what;LOW_BALANCE;hourly;once;LOW;true
+7;frivolous;daintily besides;ACCOUNT_CREATED;source now excluding;deselect veto;MEDIUM;false
+8;invite trusty;every vice;TRANSACTION_RECEIVED;railway fleck from;even shy indeed;LOW;false
+9;excess birdbath enhance;woot;ACCOUNT_CREATED;decisive;than lid;MEDIUM;false
+10;when mantua happy;gee daintily aha;PASSWORD_RESET;wallaby physical;pfft hm doubtfully;MEDIUM;false

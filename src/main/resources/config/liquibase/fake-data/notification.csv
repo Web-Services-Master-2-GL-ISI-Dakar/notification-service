@@ -1,0 +1,11 @@
+id;user_id;account_number;type;channel;title;message;recipient;status;error_message;retry_count;created_at;sent_at;metadata
+1;produce;beyond;TRANSACTION_RECEIVED;EMAIL;as flimsy;however while before;whoever elliptical quaintly;RETRY;ha sore;2509;2025-11-24T15:57:52;2025-11-25T09:24:04;shout whoever ha
+2;exempt bashfully fatal;why pry;PASSWORD_RESET;SMS;wherever colorfully for;oh finally;impossible noxious truly;PENDING;lazily;126;2025-11-25T00:43:33;2025-11-24T19:55:08;magnificent
+3;absentmindedly jubilant;cautious pushy;PASSWORD_RESET;PUSH;gadzooks;bank yippee;around shyly;PENDING;verbally common up;13989;2025-11-25T03:12:50;2025-11-25T08:14:05;uselessly sequester snowplow
+4;nor;acidly unique even;FAILED_TRANSACTION;SMS;retool;upwardly;geez partridge;FAILED;below tangible flashy;17809;2025-11-24T14:51:49;2025-11-25T04:21:49;sleet
+5;rust;inasmuch;SECURITY_ALERT;EMAIL;woot;aw coexist upliftingly;agreeable ectoderm surge;PENDING;frankly shrilly brochure;10255;2025-11-24T15:15:00;2025-11-25T05:09:06;segregate um carnival
+6;prudent why contractor;rout;SECURITY_ALERT;PUSH;pace;hard-to-find whoa;unfurl blah;FAILED;well fedora cool;19063;2025-11-24T21:54:21;2025-11-24T13:44:21;engage
+7;if and gruesome;mobilize;SECURITY_ALERT;EMAIL;calculus phooey affiliate;miserly left above;queasily;SENT;odd scoff decongestant;17072;2025-11-25T02:50:10;2025-11-24T17:05:26;fairly
+8;fooey softly;instance officially habit;FAILED_TRANSACTION;SMS;duh ill aha;times gently regarding;searchingly yahoo stealthily;CANCELLED;quizzically transplant indelible;11205;2025-11-25T02:23:35;2025-11-25T03:15:36;superb
+9;lounge given;silently embed;ACCOUNT_CREATED;SMS;unaccountably content eminent;before via within;tray;FAILED;yuck afore;19310;2025-11-25T03:02:24;2025-11-24T15:14:34;down airman
+10;meaningfully;unlined fen precedent;TRANSACTION_RECEIVED;EMAIL;colligate slap;gentle honorable;wetly;RETRY;minus;22580;2025-11-24T14:46:08;2025-11-25T04:24:11;duh psst

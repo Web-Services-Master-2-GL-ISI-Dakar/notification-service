@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb">
+  <!--
+
+Ce fichier a été généré par l'implémentation de référence JavaTM Architecture for XML Binding (JAXB), v2.3.2 
+Voir <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
+Toute modification apportée à ce fichier sera perdue lors de la recompilation du schéma source. 
+Généré le : 2025.11.30 à 06:20:22 PM UTC 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://ondmoney.sn/notification/schemas">
+    <schemaBindings map="false">
+      <package name="sn.ondmoney.notification.schemas"/>
+    </schemaBindings>
+    <bindings scd="~tns:SendNotificationRequestType">
+      <class ref="sn.ondmoney.notification.schemas.SendNotificationRequestType"/>
+    </bindings>
+    <bindings scd="~tns:SendNotificationResponseType">
+      <class ref="sn.ondmoney.notification.schemas.SendNotificationResponseType"/>
+    </bindings>
+    <bindings scd="~tns:GetNotificationStatusRequestType">
+      <class ref="sn.ondmoney.notification.schemas.GetNotificationStatusRequestType"/>
+    </bindings>
+    <bindings scd="~tns:GetNotificationStatusResponseType">
+      <class ref="sn.ondmoney.notification.schemas.GetNotificationStatusResponseType"/>
+    </bindings>
+    <bindings scd="~tns:GetUserPreferenceRequestType">
+      <class ref="sn.ondmoney.notification.schemas.GetUserPreferenceRequestType"/>
+    </bindings>
+    <bindings scd="~tns:GetUserPreferenceResponseType">
+      <class ref="sn.ondmoney.notification.schemas.GetUserPreferenceResponseType"/>
+    </bindings>
+    <bindings scd="~tns:UpdateUserPreferenceRequestType">
+      <class ref="sn.ondmoney.notification.schemas.UpdateUserPreferenceRequestType"/>
+    </bindings>
+    <bindings scd="~tns:UpdateUserPreferenceResponseType">
+      <class ref="sn.ondmoney.notification.schemas.UpdateUserPreferenceResponseType"/>
+    </bindings>
+    <bindings scd="~tns:NotificationType">
+      <typesafeEnumClass ref="sn.ondmoney.notification.schemas.NotificationType"/>
+    </bindings>
+    <bindings scd="~tns:NotificationChannel">
+      <typesafeEnumClass ref="sn.ondmoney.notification.schemas.NotificationChannel"/>
+    </bindings>
+    <bindings scd="~tns:NotificationStatus">
+      <typesafeEnumClass ref="sn.ondmoney.notification.schemas.NotificationStatus"/>
+    </bindings>
+    <bindings scd="~tns:Priority">
+      <typesafeEnumClass ref="sn.ondmoney.notification.schemas.Priority"/>
+    </bindings>
+  </bindings>
+</bindings>
+
