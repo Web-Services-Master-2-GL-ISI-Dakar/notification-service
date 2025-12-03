@@ -1,0 +1,149 @@
+// ======================================================================
+// ENUMS
+// ======================================================================
+
+/** Types de template de notification */
+enum NotificationTemplateType {
+  HTML
+  TEXT
+}
+
+/** Canaux d'envoi */
+enum NotificationChannel {
+  SMS
+  EMAIL
+  PUSH
+}
+
+/** Statut de l'envoi */
+enum NotificationStatus {
+  PENDING // En attente d'envoi (File d'attente interne)
+  SENT    // Succès confirmé par le service externe
+  FAILED  // Échec après tentatives (Déplacé vers DLQ ou Audit)
+}
+
+/** Langue de la notification */
+enum NotificationLanguage {
+  FR
+  EN
+}
+
+enum NotificationPriority{
+  HIGH
+  MEDIUM
+  LOW
+}
+
+/**
+ * Les types d'événements de notification supportés par le système Ond Money.
+ * Catégorisé par type de microservice (AUTH, TXE, AIRTIME, etc.).
+ */
+enum NotificationType {
+  // AUTH Events
+  OTP_REQUEST,
+  EMAIL_VERIFICATION_REQUEST,
+  PIN_RESET_REQUEST,
+  ACCOUNT_CREATED,
+  KYC_REQUIRED_ALERT,
+  PIN_RESET_CONFIRM,
+  SECURITY_ALERT_LOGIN,
+  ACCOUNT_BLOCKED,
+
+  // TXE (Transfer) Events
+  TRANSFER_COMPLETED,
+  TRANSFER_FAILED_FUNDS,
+  TRANSFER_FAILED_BLOCKED,
+  TRANSFER_FAILED_CONCURRENCY,
+
+  // AIRTIME Events
+  AIRTIME_COMPLETED,
+  AIRTIME_FAILED_FUNDS,
+  AIRTIME_FAILED_BLOCKED,
+
+  // BILL_PAYMENT Events
+  BILL_PAYMENT_COMPLETED,
+  BILL_PAYMENT_FAILED_FUNDS,
+  BILL_PAYMENT_FAILED_PAYEE,
+
+  // MERCHANT_PAYMENT Events
+  MERCHANT_PAYMENT_COMPLETED,
+  MERCHANT_PAYMENT_FAILED_FUNDS,
+  MERCHANT_PAYMENT_FAILED_PAYEE, // Utilisation de FAILED_PAYEE pour l'indisponibilité du compte business
+  // Nouvelle distinction pour blocage/indisponibilité du marchand
+  MERCHANT_PAYMENT_CLIENT_BLOCKED,
+  MERCHANT_PAYMENT_BUSINESS_BLOCKED,
+
+  // BANK2WALLET | WALLET2BANK Events
+  BANK2WALLET_COMPLETED,
+  WALLET2BANK_COMPLETED,
+  BANK2WALLET_FAILED_FUNDS,
+  WALLET2BANK_FAILED_FUNDS,
+  BANK2WALLET_FAILED_OND_BLOCKED,
+  WALLET2BANK_FAILED_OND_BLOCKED,
+  BANK2WALLET_FAILED_BANK_BLOCKED,
+  WALLET2BANK_FAILED_BANK_BLOCKED
+}
+
+// ======================================================================
+// ENTITÉS DE BASE
+// ======================================================================
+
+/**
+ * NotificationTemplate: Modèle utilisé pour générer le message final.
+ */
+entity NotificationTemplate {
+  templateCode String required unique // Ex: TX_SENT_SMS_FR
+  notificationChannel NotificationChannel required
+  notificationLanguage NotificationLanguage required
+  notificationType NotificationType required
+  notificationTemplateType NotificationTemplateType required // HTML ou TEXT
+  subjectTemplate String maxlength(255) // Pour EMAIL
+  bodyTemplate TextBlob required // Le corps du message avec placeholders (Ex: 'Vous avez envoyé {{amount}}...')
+  active Boolean required
+}
+
+/**
+ * NotificationLog: Log d'envoi de notification uniforme (Audit)
+ */
+entity NotificationLog {
+  // Kafka Event info
+  eventRef String required, // ID de l'événement source (Kafka Message Key fourni par le microservice émetteur)
+  eventTime Instant, // Date/heure de dépôt dans le Kafka ou reçu du microservice NOTIF si appel direct (endpoint SOAP)
+  // Notification info
+  userId String // ID de l'utilisateur cible (Ond Money User ID either a Customer or a Business(Auchan, EDK, etc))
+  recipient String required // Email, téléphone du destinataire ou Device Token pour Push qui a reçu la notification
+  notificationType NotificationType required,
+  notificationStatus NotificationStatus required,
+  notificationChannel NotificationChannel required, // Le canal utilisé (SMS, EMAIL, PUSH)
+  payload TextBlob required // Le contenu SOAP/JSON dynamique de la notification
+  sentAt Instant required, // Date/heure d'envoi de la notification
+
+  // RÉSILIENCE ET AUDIT
+  externalEventRef String // ID retourné par le service externe (Ex: Gmail, Firebase, Lafrica Mobile)
+  errorMessage String maxlength(2048)
+  retryCount Integer min(0)
+  failedAt Instant, // Date/heure de l'échec final (si applicable)
+
+  createdAt Instant
+  updatedAt Instant
+}
+
+
+// ======================================================================
+// RELATIONS
+// ======================================================================
+
+// Le log est lié au template qui a été utilisé
+relationship OneToOne {
+  NotificationLog{notificationTemplateUsed} to NotificationTemplate
+}
+
+// ======================================================================
+// CONFIGURATION
+// ======================================================================
+
+paginate * with pagination
+dto * with mapstruct
+service all with serviceImpl
+search NotificationLog, NotificationTemplate with elasticsearch
+filter NotificationLog, NotificationTemplate

@@ -1,0 +1,103 @@
+{
+  "annotations": {
+    "changelogDate": "20251130212509"
+  },
+  "applications": "*",
+  "clientRootFolder": "ondmoneyNotificationService",
+  "databaseType": "mongodb",
+  "documentation": "NotificationLog: Log d'envoi de notification uniforme (Audit)",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "eventRef",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "eventTime",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "userId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "recipient",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "notificationType",
+      "fieldType": "NotificationType",
+      "fieldTypeDocumentation": "Les types d'événements de notification supportés par le système Ond Money.\\nCatégorisé par type de microservice (AUTH, TXE, AIRTIME, etc.).",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "OTP_REQUEST,EMAIL_VERIFICATION_REQUEST,PIN_RESET_REQUEST,ACCOUNT_CREATED,KYC_REQUIRED_ALERT,PIN_RESET_CONFIRM,SECURITY_ALERT_LOGIN,ACCOUNT_BLOCKED,TRANSFER_COMPLETED,TRANSFER_FAILED_FUNDS,TRANSFER_FAILED_BLOCKED,TRANSFER_FAILED_CONCURRENCY,AIRTIME_COMPLETED,AIRTIME_FAILED_FUNDS,AIRTIME_FAILED_BLOCKED,BILL_PAYMENT_COMPLETED,BILL_PAYMENT_FAILED_FUNDS,BILL_PAYMENT_FAILED_PAYEE,MERCHANT_PAYMENT_COMPLETED,MERCHANT_PAYMENT_FAILED_FUNDS,MERCHANT_PAYMENT_FAILED_PAYEE,MERCHANT_PAYMENT_CLIENT_BLOCKED,MERCHANT_PAYMENT_BUSINESS_BLOCKED,BANK2WALLET_COMPLETED,WALLET2BANK_COMPLETED,BANK2WALLET_FAILED_FUNDS,WALLET2BANK_FAILED_FUNDS,BANK2WALLET_FAILED_OND_BLOCKED,WALLET2BANK_FAILED_OND_BLOCKED,BANK2WALLET_FAILED_BANK_BLOCKED,WALLET2BANK_FAILED_BANK_BLOCKED"
+    },
+    {
+      "fieldName": "notificationStatus",
+      "fieldType": "NotificationStatus",
+      "fieldTypeDocumentation": "Statut de l'envoi",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PENDING,SENT,FAILED"
+    },
+    {
+      "fieldName": "notificationChannel",
+      "fieldType": "NotificationChannel",
+      "fieldTypeDocumentation": "Canaux d'envoi",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SMS,EMAIL,PUSH"
+    },
+    {
+      "fieldName": "payload",
+      "fieldType": "TextBlob",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "sentAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "externalEventRef",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "errorMessage",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "2048"
+    },
+    {
+      "fieldName": "retryCount",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "failedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "microserviceName": "ondmoneyNotificationService",
+  "name": "NotificationLog",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "notificationTemplate",
+      "relationshipName": "notificationTemplateUsed",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "elasticsearch",
+  "service": "serviceImpl"
+}

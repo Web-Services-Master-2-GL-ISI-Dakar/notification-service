@@ -20,6 +20,15 @@ logging:
     org.hibernate.SQL: DEBUG
     sn.ondmoney.notification: DEBUG
 
+app:
+  firebase-configuration-file: ond-money-firebase-adminsdk.json
+
+lafrica-mobile:
+  base-url: https://lamsms.lafricamobile.com/api
+  accountid: DELFI_01
+  password: PIoWgkzupX7FUvD
+  sender: 'Ond Money'
+
 eureka:
   instance:
     prefer-ip-address: true
@@ -39,6 +48,20 @@ management:
       probability: 1.0 # report 100% of traces
 
 spring:
+  application:
+    name: ondmoneyNotification
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: mohamedsenghor05@gmail.com
+    password: fmzkmshuuxkuvyhq
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   devtools:
     restart:
       enabled: true
@@ -48,19 +71,60 @@ spring:
   jackson:
     serialization:
       indent-output: true
+
   cloud:
     config:
       uri: http://admin:${jhipster.registry.password}@localhost:8761/config
-      # name of the config server's property source (file.yml) that we want to use
       name: ondmoneyNotificationService
       profile: dev
-      label: main # toggle to switch to a different version of the configuration as stored in git
-      # it can be set to any label, branch or commit of the configuration source Git repository
+      label: main
+
+    function:
+      definition: notificationEventConsumer;notificationEventProducer;notificationHistoryEventProducer
+
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+          replication-factor: 1
+          auto-add-partitions: true
+          min-partition-count: 1
+          configuration:
+            # Add these properties for better stability
+            security.protocol: PLAINTEXT
+            retries: 3
+            request.timeout.ms: 20000
+            metadata.max.age.ms: 10000
+
+      bindings:
+        # ---- Raw Notification Consumer ----
+        notificationEventConsumer-in-0:
+          destination: notification-events
+          group: history-service
+          content-type: application/json
+
+        # ---- Raw Notification Producer ----
+        notificationEventProducer-out-0:
+          destination: notification-events
+          content-type: application/json
+
+        # ---- History Status Producer ----
+        notificationHistoryEventProducer-out-0:
+          destination: history-events
+          content-type: application/json
+
+  kafka:
+    # Additional Kafka properties for better connection handling
+    bootstrap-servers: localhost:9092
+    properties:
+      spring.json.trusted.packages: '*'
+
   data:
     mongodb:
       uri: mongodb://localhost:27017/ondmoneyNotificationService
   elasticsearch:
-    uris: http://localhost:9200
+    uris: http://localhost:9201
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
