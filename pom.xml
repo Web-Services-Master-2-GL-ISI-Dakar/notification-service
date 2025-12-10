@@ -94,7 +94,15 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web-services</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>wsdl4j</groupId>
+        <artifactId>wsdl4j</artifactId>
+      </dependency>
+      <dependency>
             <groupId>tech.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
             <version>${jhipster-framework.version}</version>
@@ -359,7 +367,28 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jaxb2-maven-plugin</artifactId>
+            <version>3.3.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>xjc</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <sources>
+                <schemaDirectory>
+                  ${project.basedir}/src/main/resources/schema
+                </schemaDirectory>
+              </sources>
+              <packageName>sn.ondmoney.notification.soap.model</packageName>
+              <clearOutputDir>false</clearOutputDir>
+            </configuration>
+          </plugin>
+          <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>

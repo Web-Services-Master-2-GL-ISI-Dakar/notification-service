@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://ondmoney.sn/notification"
+           targetNamespace="http://ondmoney.sn/notification"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           elementFormDefault="qualified">
+
+  <!-- ========================================== -->
+  <!-- TYPES COMPLEXES DE BASE -->
+  <!-- ========================================== -->
+
+  <!-- Statut de service générique -->
+  <xs:complexType name="serviceStatus">
+    <xs:sequence>
+      <xs:element name="success" type="xs:boolean"/>
+      <xs:element name="code" type="xs:string"/>
+      <xs:element name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Payload générique pour les données dynamiques -->
+  <xs:complexType name="notificationPayload">
+    <xs:sequence>
+      <!-- OTP -->
+      <xs:element name="verificationCode" type="xs:string" minOccurs="0"/>
+      <xs:element name="verificationCodeExpiryInMinutes" type="xs:int" minOccurs="0"/>
+
+      <!-- Transfert -->
+      <xs:element name="transactionId" type="xs:string" minOccurs="0"/>
+      <xs:element name="amount" type="xs:long" minOccurs="0"/>
+      <xs:element name="currency" type="xs:string" minOccurs="0"/>
+      <xs:element name="balance" type="xs:long" minOccurs="0"/>
+      <xs:element name="transactionDate" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="sender" type="xs:string" minOccurs="0"/>
+      <xs:element name="senderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="beneficiary" type="xs:string" minOccurs="0"/>
+      <xs:element name="beneficiaryName" type="xs:string" minOccurs="0"/>
+
+      <!-- Sécurité -->
+      <xs:element name="loginDateTime" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="device" type="xs:string" minOccurs="0"/>
+      <xs:element name="location" type="xs:string" minOccurs="0"/>
+      <xs:element name="accountNumber" type="xs:string" minOccurs="0"/>
+
+      <!-- Paiement Marchand -->
+      <xs:element name="merchantCode" type="xs:string" minOccurs="0"/>
+      <xs:element name="merchantName" type="xs:string" minOccurs="0"/>
+      <xs:element name="payer" type="xs:string" minOccurs="0"/>
+
+      <!-- Remboursement -->
+      <xs:element name="originalTransactionId" type="xs:string" minOccurs="0"/>
+
+      <!-- Bank2Wallet / Wallet2Bank -->
+      <xs:element name="bankName" type="xs:string" minOccurs="0"/>
+
+      <!-- Airtime -->
+      <xs:element name="operator" type="xs:string" minOccurs="0"/>
+
+      <!-- Facture -->
+      <xs:element name="company" type="xs:string" minOccurs="0"/>
+      <xs:element name="billRef" type="xs:string" minOccurs="0"/>
+
+      <!-- Statut transaction -->
+      <xs:element name="transactionStatus" type="xs:string" minOccurs="0"/>
+      <xs:element name="failureReason" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Informations de notification log -->
+  <xs:complexType name="notificationLogInfo">
+    <xs:sequence>
+      <xs:element name="id" type="xs:long"/>
+      <xs:element name="eventRef" type="xs:string"/>
+      <xs:element name="eventTime" type="xs:dateTime"/>
+      <xs:element name="userId" type="xs:string"/>
+      <xs:element name="recipient" type="xs:string"/>
+      <xs:element name="notificationType" type="xs:string"/>
+      <xs:element name="notificationStatus" type="xs:string"/>
+      <xs:element name="notificationChannel" type="xs:string"/>
+      <xs:element name="sentAt" type="xs:dateTime"/>
+      <xs:element name="externalEventRef" type="xs:string" minOccurs="0"/>
+      <xs:element name="errorMessage" type="xs:string" minOccurs="0"/>
+      <xs:element name="retryCount" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : ENVOYER UNE NOTIFICATION -->
+  <!-- ========================================== -->
+
+  <xs:element name="sendNotificationRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="eventRef" type="xs:string"/>
+        <xs:element name="notificationType" type="xs:string"/>
+        <xs:element name="notificationChannel" type="xs:string"/>
+        <xs:element name="language" type="xs:string" default="FR"/>
+        <xs:element name="priority" type="xs:string" default="MEDIUM"/>
+        <xs:element name="recipient" type="xs:string"/>
+        <xs:element name="userId" type="xs:string" minOccurs="0"/>
+        <xs:element name="payload" type="tns:notificationPayload"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NotificationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="notificationLogId" type="xs:long" minOccurs="0"/>
+        <xs:element name="externalEventRef" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : ENVOYER OTP PAR SMS -->
+  <!-- ========================================== -->
+
+  <xs:complexType name="otpInfo">
+    <xs:sequence>
+      <xs:element name="phoneNumber" type="xs:string"/>
+      <xs:element name="verificationCode" type="xs:string"/>
+      <xs:element name="expiryInMinutes" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="sendOtpRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="eventRef" type="xs:string"/>
+        <xs:element name="otp" type="tns:otpInfo"/>
+        <xs:element name="language" type="xs:string" default="FR"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OtpResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="otp" type="tns:otpInfo"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : NOTIFIER UN TRANSFERT COMPLÉTÉ -->
+  <!-- ========================================== -->
+
+  <xs:complexType name="transferInfo">
+    <xs:sequence>
+      <xs:element name="transactionId" type="xs:string"/>
+      <xs:element name="sender" type="xs:string"/>
+      <xs:element name="senderName" type="xs:string"/>
+      <xs:element name="beneficiary" type="xs:string"/>
+      <xs:element name="beneficiaryName" type="xs:string"/>
+      <xs:element name="amount" type="xs:long"/>
+      <xs:element name="currency" type="xs:string"/>
+      <xs:element name="balance" type="xs:long"/>
+      <xs:element name="transactionDate" type="xs:dateTime"/>
+      <xs:element name="transactionStatus" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="notifyTransferRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="eventRef" type="xs:string"/>
+        <xs:element name="transfer" type="tns:transferInfo"/>
+        <xs:element name="notifyReceiver" type="xs:boolean" default="true"/>
+        <xs:element name="notifySender" type="xs:boolean" default="true"/>
+        <xs:element name="language" type="xs:string" default="FR"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="TransferNotificationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="transfer" type="tns:transferInfo"/>
+        <xs:element name="receiverNotificationId" type="xs:long" minOccurs="0"/>
+        <xs:element name="senderNotificationId" type="xs:long" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : NOTIFIER UN PAIEMENT MARCHAND -->
+  <!-- ========================================== -->
+
+  <xs:complexType name="merchantPaymentInfo">
+    <xs:sequence>
+      <xs:element name="transactionId" type="xs:string"/>
+      <xs:element name="merchantCode" type="xs:string"/>
+      <xs:element name="merchantName" type="xs:string" minOccurs="0"/>
+      <xs:element name="payer" type="xs:string"/>
+      <xs:element name="amount" type="xs:long"/>
+      <xs:element name="currency" type="xs:string"/>
+      <xs:element name="transactionDate" type="xs:dateTime"/>
+      <xs:element name="transactionStatus" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="notifyMerchantPaymentRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="eventRef" type="xs:string"/>
+        <xs:element name="payment" type="tns:merchantPaymentInfo"/>
+        <xs:element name="notifyPayer" type="xs:boolean" default="true"/>
+        <xs:element name="notifyMerchant" type="xs:boolean" default="true"/>
+        <xs:element name="language" type="xs:string" default="FR"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="MerchantPaymentNotificationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="payment" type="tns:merchantPaymentInfo"/>
+        <xs:element name="payerNotificationId" type="xs:long" minOccurs="0"/>
+        <xs:element name="merchantNotificationId" type="xs:long" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : ALERTE DE SÉCURITÉ -->
+  <!-- ========================================== -->
+
+  <xs:complexType name="securityAlertInfo">
+    <xs:sequence>
+      <xs:element name="userId" type="xs:string"/>
+      <xs:element name="phoneNumber" type="xs:string"/>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="loginDateTime" type="xs:dateTime"/>
+      <xs:element name="device" type="xs:string"/>
+      <xs:element name="location" type="xs:string"/>
+      <xs:element name="ipAddress" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="sendSecurityAlertRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="eventRef" type="xs:string"/>
+        <xs:element name="alert" type="tns:securityAlertInfo"/>
+        <xs:element name="sendSms" type="xs:boolean" default="true"/>
+        <xs:element name="sendEmail" type="xs:boolean" default="true"/>
+        <xs:element name="sendPush" type="xs:boolean" default="true"/>
+        <xs:element name="language" type="xs:string" default="FR"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SecurityAlertResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="alert" type="tns:securityAlertInfo"/>
+        <xs:element name="smsNotificationId" type="xs:long" minOccurs="0"/>
+        <xs:element name="emailNotificationId" type="xs:long" minOccurs="0"/>
+        <xs:element name="pushNotificationId" type="xs:long" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : RÉCUPÉRER LES LOGS -->
+  <!-- ========================================== -->
+
+  <xs:element name="getNotificationLogsRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="userId" type="xs:string" minOccurs="0"/>
+        <xs:element name="eventRef" type="xs:string" minOccurs="0"/>
+        <xs:element name="notificationType" type="xs:string" minOccurs="0"/>
+        <xs:element name="notificationChannel" type="xs:string" minOccurs="0"/>
+        <xs:element name="notificationStatus" type="xs:string" minOccurs="0"/>
+        <xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="endDate" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="page" type="xs:int" default="0"/>
+        <xs:element name="size" type="xs:int" default="20"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NotificationLogsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="logs" type="tns:notificationLogInfo" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="totalElements" type="xs:long"/>
+        <xs:element name="totalPages" type="xs:int"/>
+        <xs:element name="currentPage" type="xs:int"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : RÉCUPÉRER UN LOG PAR ID -->
+  <!-- ========================================== -->
+
+  <xs:element name="getNotificationLogByIdRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="logId" type="xs:long"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NotificationLogResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="log" type="tns:notificationLogInfo" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : RENVOYER UNE NOTIFICATION -->
+  <!-- ========================================== -->
+
+  <xs:element name="retryNotificationRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="logId" type="xs:long"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="RetryNotificationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="newNotificationLogId" type="xs:long" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ========================================== -->
+  <!-- REQUÊTE : VÉRIFIER L'ÉTAT DU SERVICE -->
+  <!-- ========================================== -->
+
+  <xs:element name="healthCheckRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="timestamp" type="xs:dateTime"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="HealthCheckResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="status" type="tns:serviceStatus"/>
+        <xs:element name="serviceName" type="xs:string"/>
+        <xs:element name="version" type="xs:string"/>
+        <xs:element name="uptime" type="xs:long"/>
+        <xs:element name="smsProviderStatus" type="xs:string"/>
+        <xs:element name="emailProviderStatus" type="xs:string"/>
+        <xs:element name="pushProviderStatus" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
