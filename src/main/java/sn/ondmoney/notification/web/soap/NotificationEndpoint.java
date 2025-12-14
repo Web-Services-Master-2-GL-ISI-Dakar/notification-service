@@ -1,6 +1,5 @@
 package sn.ondmoney.notification.web.soap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -86,8 +84,14 @@ public class NotificationEndpoint {
     // ========================================
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "sendNotificationRequest")
     @ResponsePayload
-    public NotificationResponse sendNotification(@RequestPayload SendNotificationRequest request) {
+    public sn.ondmoney.notification.soap.model.NotificationResponse sendNotification(
+        @RequestPayload SendNotificationRequest request) {
         log.debug("SOAP Request: sendNotification for eventRef={}", request.getEventRef());
+
+        // Créer la réponse SOAP
+        sn.ondmoney.notification.soap.model.NotificationResponse soapResponse =
+            new sn.ondmoney.notification.soap.model.NotificationResponse();
+        ServiceStatus status = new ServiceStatus();
 
         try {
             // Convertir le payload SOAP en NotificationPayload DTO
@@ -103,7 +107,7 @@ public class NotificationEndpoint {
                 notificationType,
                 notificationChannel,
                 notificationLanguage,
-                1 // Version par défaut
+                1
             );
 
             if (templateOpt.isEmpty()) {
@@ -185,53 +189,25 @@ public class NotificationEndpoint {
 
             NotificationLogDTO savedLog = notificationLogService.save(logDto);
 
-            // Créer le DeliveryReceipt complet pour ce canal
-            DeliveryReceipt receipt = DeliveryReceipt.builder()
-                .notificationLogId(savedLog.getId())
-                .eventRef(request.getEventRef())
-                .eventTime(Instant.now())
-                .recipient(request.getRecipient())
-                .notificationType(notificationType)
-                .notificationChannel(notificationChannel)
-                .notificationStatus(notificationStatus)
-                .sentAt(sentAt)
-                .errorMessage(errorMessage)
-                .build();
+            // Construire la réponse SOAP
+            status.setSuccess(true);
+            status.setCode(notificationStatus.name());
+            status.setMessage("Notification traitée avec succès");
 
-            // Construire la réponse adaptée au DTO NotificationResponse
-            return NotificationResponse.builder()
-                .eventRef(request.getEventRef())
-                .eventTime(Instant.now())
-                .notificationStatus(notificationStatus)
-                .notificationType(notificationType)
-                .deliveryReceipts(List.of(receipt))
-                .payload(objectMapper.writeValueAsString(payloadDto))
-                .build();
+            soapResponse.setStatus(status);
+            soapResponse.setNotificationLogId(Long.parseLong(savedLog.getId()));
+            soapResponse.setExternalEventRef(externalRef);
 
         } catch (Exception e) {
             log.error("Erreur lors du traitement de la notification", e);
 
-            // En cas d'erreur globale, retourner une réponse avec statut FAILED
-            DeliveryReceipt failedReceipt = DeliveryReceipt.builder()
-                .eventRef(request.getEventRef())
-                .eventTime(Instant.now())
-                .recipient(request.getRecipient())
-                .notificationType(NotificationType.valueOf(request.getNotificationType()))
-                .notificationChannel(NotificationChannel.valueOf(request.getNotificationChannel()))
-                .notificationStatus(NotificationStatus.FAILED)
-                .sentAt(Instant.now())
-                .errorMessage(e.getMessage())
-                .build();
-
-            return NotificationResponse.builder()
-                .eventRef(request.getEventRef())
-                .eventTime(Instant.now())
-                .notificationStatus(NotificationStatus.FAILED)
-                .notificationType(NotificationType.valueOf(request.getNotificationType()))
-                .deliveryReceipts(List.of(failedReceipt))
-                .payload(request.getPayload() != null ? request.getPayload().toString() : null)
-                .build();
+            status.setSuccess(false);
+            status.setCode("NOTIFICATION_ERROR");
+            status.setMessage(e.getMessage());
+            soapResponse.setStatus(status);
         }
+
+        return soapResponse;
     }
     // ========================================
     // 2. ENVOI D'OTP
