@@ -195,7 +195,7 @@ public class NotificationEndpoint {
             status.setMessage("Notification traitée avec succès");
 
             soapResponse.setStatus(status);
-            soapResponse.setNotificationLogId(Long.parseLong(savedLog.getId()));
+            soapResponse.setNotificationLogId(savedLog.getId());
             soapResponse.setExternalEventRef(externalRef);
 
         } catch (Exception e) {
@@ -302,8 +302,8 @@ public class NotificationEndpoint {
 
         try {
             TransferInfo transfer = request.getTransfer();
-            Long receiverNotifId = null;
-            Long senderNotifId = null;
+            String receiverNotifId = null;
+            String senderNotifId = null;
 
             // Notifier le receveur
             if (request.isNotifyReceiver()) {
@@ -314,9 +314,9 @@ public class NotificationEndpoint {
                     .senderName(transfer.getSenderName())
                     .receiverPhone(transfer.getBeneficiary())
                     .receiverName(transfer.getBeneficiaryName())
-                    .amount(BigDecimal.valueOf(transfer.getAmount()))
+                    .amount(BigDecimal.valueOf(Long.parseLong(transfer.getAmount())))
                     .currency(transfer.getCurrency())
-                    .receiverBalance(BigDecimal.valueOf(transfer.getBalance()))
+                    .receiverBalance(BigDecimal.valueOf(Long.parseLong(transfer.getBalance())))
                     .transactionDate(toInstant(transfer.getTransactionDate()))
                     .transactionStatus(transfer.getTransactionStatus())
                     .build();
@@ -339,9 +339,9 @@ public class NotificationEndpoint {
                     .senderName(transfer.getSenderName())
                     .receiverPhone(transfer.getBeneficiary())
                     .receiverName(transfer.getBeneficiaryName())
-                    .amount(BigDecimal.valueOf(transfer.getAmount()))
+                    .amount(BigDecimal.valueOf(Long.parseLong(transfer.getAmount())))
                     .currency(transfer.getCurrency())
-                    .senderBalance(BigDecimal.valueOf(transfer.getBalance()))
+                    .senderBalance(BigDecimal.valueOf(Long.parseLong(transfer.getBalance())))
                     .transactionDate(toInstant(transfer.getTransactionDate()))
                     .transactionStatus(transfer.getTransactionStatus())
                     .build();
@@ -396,8 +396,8 @@ public class NotificationEndpoint {
 
         try {
             MerchantPaymentInfo payment = request.getPayment();
-            Long payerNotifId = null;
-            Long merchantNotifId = null;
+            String payerNotifId = null;
+            String merchantNotifId = null;
 
             // Notifier le payeur
             if (request.isNotifyPayer()) {
@@ -407,7 +407,7 @@ public class NotificationEndpoint {
                     .senderPhone(payment.getPayer()) // Le payeur
                     .receiverPhone(payment.getMerchantCode()) // Le marchand
                     .receiverName(payment.getMerchantName())
-                    .amount(BigDecimal.valueOf(payment.getAmount()))
+                    .amount(BigDecimal.valueOf(Long.parseLong(payment.getAmount())))
                     .currency(payment.getCurrency())
                     .transactionDate(toInstant(payment.getTransactionDate()))
                     .transactionStatus(payment.getTransactionStatus())
@@ -431,7 +431,7 @@ public class NotificationEndpoint {
                     .senderPhone(payment.getPayer())
                     .receiverPhone(payment.getMerchantCode())
                     .receiverName(payment.getMerchantName())
-                    .amount(BigDecimal.valueOf(payment.getAmount()))
+                    .amount(BigDecimal.valueOf(Long.parseLong(payment.getAmount())))
                     .currency(payment.getCurrency())
                     .transactionDate(toInstant(payment.getTransactionDate()))
                     .transactionStatus(payment.getTransactionStatus())
@@ -502,9 +502,9 @@ public class NotificationEndpoint {
                 .additionalData(additionalData)
                 .build();
 
-            Long smsNotifId = null;
-            Long emailNotifId = null;
-            Long pushNotifId = null;
+            String smsNotifId = null;
+            String emailNotifId = null;
+            String pushNotifId = null;
 
             // Envoyer SMS
             if (request.isSendSms()) {
@@ -592,7 +592,7 @@ public class NotificationEndpoint {
 
             response.setStatus(status);
             response.getLogs().addAll(logs);
-            response.setTotalElements(logsPage.getTotalElements());
+            response.setTotalElements(String.valueOf(logsPage.getTotalElements()));
             response.setTotalPages(logsPage.getTotalPages());
             response.setCurrentPage(logsPage.getNumber());
 
@@ -686,7 +686,7 @@ public class NotificationEndpoint {
             status.setMessage("Notification marquée pour retry");
 
             response.setStatus(status);
-            response.setNewNotificationLogId(Long.parseLong(updatedLog.getId()));
+            response.setNewNotificationLogId(updatedLog.getId());
 
         } catch (Exception e) {
             log.error("Erreur lors du renvoi de la notification", e);
@@ -719,7 +719,7 @@ public class NotificationEndpoint {
             response.setStatus(status);
             response.setServiceName("Ond Money Notification Service");
             response.setVersion("1.0.0");
-            response.setUptime(System.currentTimeMillis());
+            response.setUptime(String.valueOf(System.currentTimeMillis()));
             response.setSmsProviderStatus("UP");
             response.setEmailProviderStatus("UP");
             response.setPushProviderStatus("UP");
@@ -755,11 +755,11 @@ public class NotificationEndpoint {
         if (soapPayload.getTransactionId() != null)
             builder.transactionId(soapPayload.getTransactionId());
         if (soapPayload.getAmount() != null)
-            builder.amount(BigDecimal.valueOf(soapPayload.getAmount()));
+            builder.amount(BigDecimal.valueOf(Long.parseLong(soapPayload.getAmount())));
         if (soapPayload.getCurrency() != null)
             builder.currency(soapPayload.getCurrency());
         if (soapPayload.getBalance() != null)
-            builder.clientBalance(BigDecimal.valueOf(soapPayload.getBalance()));
+            builder.clientBalance(BigDecimal.valueOf(Long.parseLong(soapPayload.getBalance())));
         if (soapPayload.getTransactionDate() != null)
             builder.transactionDate(toInstant(soapPayload.getTransactionDate()));
         if (soapPayload.getTransactionStatus() != null)
@@ -821,7 +821,7 @@ public class NotificationEndpoint {
     /**
      * Envoie une notification de transfert
      */
-    private Long sendTransferNotification(String eventRef, NotificationType notificationType,
+    private String sendTransferNotification(String eventRef, NotificationType notificationType,
                                           String recipient, NotificationPayload payload, NotificationLanguage language) throws Exception {
 
         Optional<NotificationTemplateDTO> templateOpt = notificationTemplateService.findActiveTemplateByCompositeKey(
@@ -852,13 +852,13 @@ public class NotificationEndpoint {
             .build();
 
         NotificationLogDTO saved = notificationLogService.save(logDto);
-        return Long.parseLong(saved.getId());
+        return saved.getId();
     }
 
     /**
      * Envoie une notification de paiement marchand
      */
-    private Long sendMerchantPaymentNotification(String eventRef, NotificationType notificationType,
+    private String sendMerchantPaymentNotification(String eventRef, NotificationType notificationType,
                                                  String recipient, NotificationPayload payload, NotificationLanguage language) throws Exception {
 
         Optional<NotificationTemplateDTO> templateOpt = notificationTemplateService.findActiveTemplateByCompositeKey(
@@ -889,13 +889,13 @@ public class NotificationEndpoint {
             .build();
 
         NotificationLogDTO saved = notificationLogService.save(logDto);
-        return Long.parseLong(saved.getId());
+        return saved.getId();
     }
 
     /**
      * Envoie une alerte de sécurité
      */
-    private Long sendSecurityAlertNotification(String eventRef, NotificationChannel channel,
+    private String sendSecurityAlertNotification(String eventRef, NotificationChannel channel,
                                                String recipient, String userId, NotificationPayload payload, NotificationLanguage language) throws Exception {
 
         Optional<NotificationTemplateDTO> templateOpt = notificationTemplateService.findActiveTemplateByCompositeKey(
@@ -936,7 +936,7 @@ public class NotificationEndpoint {
             .build();
 
         NotificationLogDTO saved = notificationLogService.save(logDto);
-        return Long.parseLong(saved.getId());
+        return saved.getId();
     }
 
     /**
@@ -944,7 +944,7 @@ public class NotificationEndpoint {
      */
     private NotificationLogInfo convertToNotificationLogInfo(NotificationLogDTO dto) {
         NotificationLogInfo info = new NotificationLogInfo();
-        info.setId(Long.parseLong(dto.getId()));
+        info.setId(dto.getId());
         info.setEventRef(dto.getEventRef());
         info.setEventTime(toXMLGregorianCalendar(dto.getEventTime()));
         info.setUserId(dto.getUserId());

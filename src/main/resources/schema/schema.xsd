@@ -27,9 +27,9 @@
 
       <!-- Transfert -->
       <xs:element name="transactionId" type="xs:string" minOccurs="0"/>
-      <xs:element name="amount" type="xs:long" minOccurs="0"/>
+      <xs:element name="amount" type="xs:string" minOccurs="0"/>
       <xs:element name="currency" type="xs:string" minOccurs="0"/>
-      <xs:element name="balance" type="xs:long" minOccurs="0"/>
+      <xs:element name="balance" type="xs:string" minOccurs="0"/>
       <xs:element name="transactionDate" type="xs:dateTime" minOccurs="0"/>
       <xs:element name="sender" type="xs:string" minOccurs="0"/>
       <xs:element name="senderName" type="xs:string" minOccurs="0"/>
@@ -69,7 +69,7 @@
   <!-- Informations de notification log -->
   <xs:complexType name="notificationLogInfo">
     <xs:sequence>
-      <xs:element name="id" type="xs:long"/>
+      <xs:element name="id" type="xs:string"/>
       <xs:element name="eventRef" type="xs:string"/>
       <xs:element name="eventTime" type="xs:dateTime"/>
       <xs:element name="userId" type="xs:string"/>
@@ -155,9 +155,9 @@
       <xs:element name="senderName" type="xs:string"/>
       <xs:element name="beneficiary" type="xs:string"/>
       <xs:element name="beneficiaryName" type="xs:string"/>
-      <xs:element name="amount" type="xs:long"/>
+      <xs:element name="amount" type="xs:string"/>
       <xs:element name="currency" type="xs:string"/>
-      <xs:element name="balance" type="xs:long"/>
+      <xs:element name="balance" type="xs:string"/>
       <xs:element name="transactionDate" type="xs:dateTime"/>
       <xs:element name="transactionStatus" type="xs:string"/>
     </xs:sequence>
@@ -196,7 +196,7 @@
       <xs:element name="merchantCode" type="xs:string"/>
       <xs:element name="merchantName" type="xs:string" minOccurs="0"/>
       <xs:element name="payer" type="xs:string"/>
-      <xs:element name="amount" type="xs:long"/>
+      <xs:element name="amount" type="xs:string"/>
       <xs:element name="currency" type="xs:string"/>
       <xs:element name="transactionDate" type="xs:dateTime"/>
       <xs:element name="transactionStatus" type="xs:string"/>
@@ -292,7 +292,7 @@
       <xs:sequence>
         <xs:element name="status" type="tns:serviceStatus"/>
         <xs:element name="logs" type="tns:notificationLogInfo" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element name="totalElements" type="xs:long"/>
+        <xs:element name="totalElements" type="xs:string"/>
         <xs:element name="totalPages" type="xs:int"/>
         <xs:element name="currentPage" type="xs:int"/>
       </xs:sequence>
@@ -359,7 +359,7 @@
         <xs:element name="status" type="tns:serviceStatus"/>
         <xs:element name="serviceName" type="xs:string"/>
         <xs:element name="version" type="xs:string"/>
-        <xs:element name="uptime" type="xs:long"/>
+        <xs:element name="uptime" type="xs:string"/>
         <xs:element name="smsProviderStatus" type="xs:string"/>
         <xs:element name="emailProviderStatus" type="xs:string"/>
         <xs:element name="pushProviderStatus" type="xs:string"/>
