@@ -1,0 +1,5 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    sn.ondmoney.notification.config.\
+    TestContainersSpringContextCustomizerFactory,sn.ondmoney.notification.\
+    config.RedisTestContainersSpringContextCustomizerFactory,sn.ondmoney.\
+    notification.config.KafkaTestContainersSpringContextCustomizerFactory

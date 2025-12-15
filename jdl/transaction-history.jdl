@@ -1,0 +1,61 @@
+//application {
+//  config {
+//    baseName transactionHistory
+//    applicationType microservice
+//    packageName sn.ondmoney.history
+//    authenticationType oauth2
+//    databaseType sql
+//    devDatabaseType postgresql
+//    prodDatabaseType postgresql
+//    searchEngine elasticsearch
+//    cacheProvider redis
+//    serviceDiscoveryType eureka
+//    serverPort 8083
+//  }
+//  entities *
+//}
+
+/**
+ * Copie dénormalisée d'une transaction pour la recherche
+ * Optimisée pour Elasticsearch
+ */
+entity TransactionHistory {
+  transactionId String required unique // ⚠️ ID externe vers Transaction (TXE)
+  accountId Long required // ⚠️ ID du compte concerné (TXE)
+  userId Long required // ⚠️ ID de l'utilisateur (AUTH)
+  transactionType TransactionType required
+  amount BigDecimal required
+  currency Currency required
+  counterpartyAccountId Long // ID du compte de l'autre partie
+  counterpartyName String maxlength(100) // Nom dénormalisé pour la recherche
+  description String maxlength(255)
+  status TransactionStatus required
+  timestamp Instant required
+  balanceAfter BigDecimal // Solde après transaction (snapshot)
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER_SENT
+  TRANSFER_RECEIVED
+  PAYMENT
+}
+
+enum TransactionStatus {
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum Currency {
+  XOF
+  EUR
+  USD
+}
+
+dto * with mapstruct
+service * with serviceImpl
+paginate * with pagination
+filter TransactionHistory

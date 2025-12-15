@@ -1,0 +1,79 @@
+//application {
+//  config {
+//    baseName transactionEngine
+//    applicationType microservice
+//    packageName sn.ondmoney.txengine
+//    authenticationType oauth2
+//    databaseType sql
+//    devDatabaseType postgresql
+//    prodDatabaseType postgresql
+//    cacheProvider redis
+//    serviceDiscoveryType eureka
+//    serverPort 8082
+//  }
+//  entities *
+//}
+
+/**
+ * Compte Ond Money d'un utilisateur
+ * Référence userId depuis AUTH
+ */
+entity OndAccount {
+  accountNumber String required unique minlength(10) maxlength(20)
+  balance BigDecimal required min(0)
+  currency Currency required
+  userId Long required // ⚠️ ID externe vers User (AUTH)
+  status AccountStatus required
+  createdAt Instant required
+  updatedAt Instant
+}
+
+/**
+ * Transaction financière
+ */
+entity Transaction {
+  transactionId String required unique // UUID ou référence unique
+  transactionType TransactionType required
+  amount BigDecimal required min(0)
+  currency Currency required
+  sourceAccountId Long // ID du compte source (peut être null pour dépôt)
+  destinationAccountId Long required // ID du compte destination
+  fees BigDecimal min(0)
+  description String maxlength(255)
+  status TransactionStatus required
+  initiatedAt Instant required
+  completedAt Instant
+  failureReason String maxlength(500)
+}
+
+enum Currency {
+  XOF  // Franc CFA
+  EUR
+  USD
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum TransactionType {
+  DEPOSIT      // Dépôt
+  WITHDRAWAL   // Retrait
+  TRANSFER     // Transfert
+  PAYMENT      // Paiement (pour futurs services)
+}
+
+enum TransactionStatus {
+  PENDING      // En cours
+  COMPLETED    // Terminée avec succès
+  FAILED       // Échec
+  CANCELLED    // Annulée
+  REFUNDED     // Remboursée
+}
+
+dto * with mapstruct
+service * with serviceImpl
+paginate * with pagination
+filter OndAccount, Transaction

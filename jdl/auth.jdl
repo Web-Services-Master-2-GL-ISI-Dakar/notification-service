@@ -1,0 +1,49 @@
+//application {
+//  config {
+//    baseName authService
+//    applicationType microservice
+//    packageName sn.ondmoney.auth
+//    authenticationType oauth2
+//    databaseType sql
+//    devDatabaseType postgresql
+//    prodDatabaseType postgresql
+//    cacheProvider redis
+//    serviceDiscoveryType eureka
+//    serverPort 8081
+//  }
+//  entities *
+//}
+
+/**
+ * Profil de sécurité et statut du compte
+ */
+entity AccountProfile {
+  phoneNumber String required unique minlength(9) maxlength(15)
+  email String unique pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)
+  pinHash String // Hachage bcrypt du PIN
+  status AccountStatus
+  keycloakId String unique // ID de l'utilisateur dans Keycloak
+  otpCode String maxlength(6)
+  otpExpiresAt Instant
+  failedLoginAttempts Integer min(0) max(5)
+  lastLoginAt Instant
+  createdAt Instant
+  updatedAt Instant
+}
+
+enum AccountStatus {
+  PENDING      // En attente de vérification OTP
+  ACTIVE       // Compte actif
+  SUSPENDED    // Compte suspendu
+  LOCKED       // Verrouillé (trop de tentatives)
+  CLOSED       // Compte fermé
+}
+
+relationship OneToOne {
+  AccountProfile{user} to User
+}
+
+dto * with mapstruct
+service * with serviceImpl
+paginate * with pagination
+filter User, AccountProfile
