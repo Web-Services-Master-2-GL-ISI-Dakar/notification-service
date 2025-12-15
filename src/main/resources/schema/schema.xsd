@@ -107,7 +107,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="status" type="tns:serviceStatus"/>
-        <xs:element name="notificationLogId" type="xs:long" minOccurs="0"/>
+        <xs:element name="notificationLogId" type="xs:string" minOccurs="0"/>
         <xs:element name="externalEventRef" type="xs:string" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>
@@ -180,8 +180,8 @@
       <xs:sequence>
         <xs:element name="status" type="tns:serviceStatus"/>
         <xs:element name="transfer" type="tns:transferInfo"/>
-        <xs:element name="receiverNotificationId" type="xs:long" minOccurs="0"/>
-        <xs:element name="senderNotificationId" type="xs:long" minOccurs="0"/>
+        <xs:element name="receiverNotificationId" type="xs:string" minOccurs="0"/>
+        <xs:element name="senderNotificationId" type="xs:string" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -220,8 +220,8 @@
       <xs:sequence>
         <xs:element name="status" type="tns:serviceStatus"/>
         <xs:element name="payment" type="tns:merchantPaymentInfo"/>
-        <xs:element name="payerNotificationId" type="xs:long" minOccurs="0"/>
-        <xs:element name="merchantNotificationId" type="xs:long" minOccurs="0"/>
+        <xs:element name="payerNotificationId" type="xs:string" minOccurs="0"/>
+        <xs:element name="merchantNotificationId" type="xs:string" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -260,9 +260,9 @@
       <xs:sequence>
         <xs:element name="status" type="tns:serviceStatus"/>
         <xs:element name="alert" type="tns:securityAlertInfo"/>
-        <xs:element name="smsNotificationId" type="xs:long" minOccurs="0"/>
-        <xs:element name="emailNotificationId" type="xs:long" minOccurs="0"/>
-        <xs:element name="pushNotificationId" type="xs:long" minOccurs="0"/>
+        <xs:element name="smsNotificationId" type="xs:string" minOccurs="0"/>
+        <xs:element name="emailNotificationId" type="xs:string" minOccurs="0"/>
+        <xs:element name="pushNotificationId" type="xs:string" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -306,7 +306,7 @@
   <xs:element name="getNotificationLogByIdRequest">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="logId" type="xs:long"/>
+        <xs:element name="logId" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -327,7 +327,7 @@
   <xs:element name="retryNotificationRequest">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="logId" type="xs:long"/>
+        <xs:element name="logId" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -336,7 +336,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="status" type="tns:serviceStatus"/>
-        <xs:element name="newNotificationLogId" type="xs:long" minOccurs="0"/>
+        <xs:element name="newNotificationLogId" type="xs:string" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
