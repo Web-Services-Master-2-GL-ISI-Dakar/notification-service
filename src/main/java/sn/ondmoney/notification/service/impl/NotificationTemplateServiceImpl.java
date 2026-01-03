@@ -3,6 +3,7 @@ package sn.ondmoney.notification.service.impl;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,16 +29,16 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
 
     private final NotificationTemplateMapper notificationTemplateMapper;
 
-    private final NotificationTemplateSearchRepository notificationTemplateSearchRepository;
+    // Elasticsearch est optionnel en dev
+    @Autowired(required = false)
+    private NotificationTemplateSearchRepository notificationTemplateSearchRepository;
 
     public NotificationTemplateServiceImpl(
         NotificationTemplateRepository notificationTemplateRepository,
-        NotificationTemplateMapper notificationTemplateMapper,
-        NotificationTemplateSearchRepository notificationTemplateSearchRepository
+        NotificationTemplateMapper notificationTemplateMapper
     ) {
         this.notificationTemplateRepository = notificationTemplateRepository;
         this.notificationTemplateMapper = notificationTemplateMapper;
-        this.notificationTemplateSearchRepository = notificationTemplateSearchRepository;
     }
 
     @Override
@@ -45,7 +46,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         LOG.debug("Request to save NotificationTemplate : {}", notificationTemplateDTO);
         NotificationTemplate notificationTemplate = notificationTemplateMapper.toEntity(notificationTemplateDTO);
         notificationTemplate = notificationTemplateRepository.save(notificationTemplate);
-        notificationTemplateSearchRepository.index(notificationTemplate);
+        if (notificationTemplateSearchRepository != null) {
+            notificationTemplateSearchRepository.index(notificationTemplate);
+        }
         return notificationTemplateMapper.toDto(notificationTemplate);
     }
 
@@ -54,7 +57,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         LOG.debug("Request to update NotificationTemplate : {}", notificationTemplateDTO);
         NotificationTemplate notificationTemplate = notificationTemplateMapper.toEntity(notificationTemplateDTO);
         notificationTemplate = notificationTemplateRepository.save(notificationTemplate);
-        notificationTemplateSearchRepository.index(notificationTemplate);
+        if (notificationTemplateSearchRepository != null) {
+            notificationTemplateSearchRepository.index(notificationTemplate);
+        }
         return notificationTemplateMapper.toDto(notificationTemplate);
     }
 
@@ -71,7 +76,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
             })
             .map(notificationTemplateRepository::save)
             .map(savedNotificationTemplate -> {
-                notificationTemplateSearchRepository.index(savedNotificationTemplate);
+                if (notificationTemplateSearchRepository != null) {
+                    notificationTemplateSearchRepository.index(savedNotificationTemplate);
+                }
                 return savedNotificationTemplate;
             })
             .map(notificationTemplateMapper::toDto);
@@ -93,13 +100,19 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     public void delete(String id) {
         LOG.debug("Request to delete NotificationTemplate : {}", id);
         notificationTemplateRepository.deleteById(id);
-        notificationTemplateSearchRepository.deleteFromIndexById(id);
+        if (notificationTemplateSearchRepository != null) {
+            notificationTemplateSearchRepository.deleteFromIndexById(id);
+        }
     }
 
     @Override
     public Page<NotificationTemplateDTO> search(String query, Pageable pageable) {
         LOG.debug("Request to search for a page of NotificationTemplates for query {}", query);
-        return notificationTemplateSearchRepository.search(query, pageable).map(notificationTemplateMapper::toDto);
+        if (notificationTemplateSearchRepository != null) {
+            return notificationTemplateSearchRepository.search(query, pageable).map(notificationTemplateMapper::toDto);
+        }
+        LOG.warn("Elasticsearch not available, returning empty page for search");
+        return Page.empty(pageable);
     }
 
     /**
@@ -117,28 +130,32 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         NotificationLanguage lang,
         int version
     ) {
-        // Find in elasticsearch first
         // 1. COMBINAISON DE LA CLÉ (La logique métier principale)
         // Format attendu: EVENT_TYPE_CHANNEL_LANG_VERSION
         String templateCode = String.format("%s_%s_%s_V%d", eventType.name(), channel.name(), lang.name(), version);
         LOG.debug("Template code: {}", templateCode);
 
-        NotificationTemplate notificationTemplate = notificationTemplateSearchRepository.findNotificationTemplateByTemplateCode(
-            templateCode
-        );
-        if (notificationTemplate != null) {
-            LOG.debug("Found template in Elasticsearch for code: {}", templateCode);
-            return Optional.of(notificationTemplateMapper.toDto(notificationTemplate));
+        // Try Elasticsearch first if available
+        if (notificationTemplateSearchRepository != null) {
+            NotificationTemplate notificationTemplate = notificationTemplateSearchRepository.findNotificationTemplateByTemplateCode(
+                templateCode
+            );
+            if (notificationTemplate != null) {
+                LOG.debug("Found template in Elasticsearch for code: {}", templateCode);
+                return Optional.of(notificationTemplateMapper.toDto(notificationTemplate));
+            }
         }
 
         // 2. Appel au Repository (recherche par la clé unique)
-        notificationTemplate = notificationTemplateRepository.findOneByTemplateCode(templateCode).orElse(null);
+        NotificationTemplate notificationTemplate = notificationTemplateRepository.findOneByTemplateCode(templateCode).orElse(null);
         if (notificationTemplate == null) {
             return Optional.empty();
         }
         LOG.debug("Found template in database for code: {}", templateCode);
-        // Index it in Elasticsearch
-        notificationTemplateSearchRepository.index(notificationTemplate);
+        // Index it in Elasticsearch if available
+        if (notificationTemplateSearchRepository != null) {
+            notificationTemplateSearchRepository.index(notificationTemplate);
+        }
         return Optional.ofNullable(notificationTemplateMapper.toDto(notificationTemplate));
     }
 }

@@ -3,6 +3,7 @@ package sn.ondmoney.notification.service.impl;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,16 +26,16 @@ public class NotificationLogServiceImpl implements NotificationLogService {
 
     private final NotificationLogMapper notificationLogMapper;
 
-    private final NotificationLogSearchRepository notificationLogSearchRepository;
+    // Elasticsearch est optionnel en dev
+    @Autowired(required = false)
+    private NotificationLogSearchRepository notificationLogSearchRepository;
 
     public NotificationLogServiceImpl(
         NotificationLogRepository notificationLogRepository,
-        NotificationLogMapper notificationLogMapper,
-        NotificationLogSearchRepository notificationLogSearchRepository
+        NotificationLogMapper notificationLogMapper
     ) {
         this.notificationLogRepository = notificationLogRepository;
         this.notificationLogMapper = notificationLogMapper;
-        this.notificationLogSearchRepository = notificationLogSearchRepository;
     }
 
     @Override
@@ -42,7 +43,9 @@ public class NotificationLogServiceImpl implements NotificationLogService {
         LOG.debug("Request to save NotificationLog : {}", notificationLogDTO);
         NotificationLog notificationLog = notificationLogMapper.toEntity(notificationLogDTO);
         notificationLog = notificationLogRepository.save(notificationLog);
-        notificationLogSearchRepository.index(notificationLog);
+        if (notificationLogSearchRepository != null) {
+            notificationLogSearchRepository.index(notificationLog);
+        }
         return notificationLogMapper.toDto(notificationLog);
     }
 
@@ -51,7 +54,9 @@ public class NotificationLogServiceImpl implements NotificationLogService {
         LOG.debug("Request to update NotificationLog : {}", notificationLogDTO);
         NotificationLog notificationLog = notificationLogMapper.toEntity(notificationLogDTO);
         notificationLog = notificationLogRepository.save(notificationLog);
-        notificationLogSearchRepository.index(notificationLog);
+        if (notificationLogSearchRepository != null) {
+            notificationLogSearchRepository.index(notificationLog);
+        }
         return notificationLogMapper.toDto(notificationLog);
     }
 
@@ -68,7 +73,9 @@ public class NotificationLogServiceImpl implements NotificationLogService {
             })
             .map(notificationLogRepository::save)
             .map(savedNotificationLog -> {
-                notificationLogSearchRepository.index(savedNotificationLog);
+                if (notificationLogSearchRepository != null) {
+                    notificationLogSearchRepository.index(savedNotificationLog);
+                }
                 return savedNotificationLog;
             })
             .map(notificationLogMapper::toDto);
@@ -90,12 +97,18 @@ public class NotificationLogServiceImpl implements NotificationLogService {
     public void delete(String id) {
         LOG.debug("Request to delete NotificationLog : {}", id);
         notificationLogRepository.deleteById(id);
-        notificationLogSearchRepository.deleteFromIndexById(id);
+        if (notificationLogSearchRepository != null) {
+            notificationLogSearchRepository.deleteFromIndexById(id);
+        }
     }
 
     @Override
     public Page<NotificationLogDTO> search(String query, Pageable pageable) {
         LOG.debug("Request to search for a page of NotificationLogs for query {}", query);
-        return notificationLogSearchRepository.search(query, pageable).map(notificationLogMapper::toDto);
+        if (notificationLogSearchRepository != null) {
+            return notificationLogSearchRepository.search(query, pageable).map(notificationLogMapper::toDto);
+        }
+        LOG.warn("Elasticsearch not available, returning empty page for search");
+        return Page.empty(pageable);
     }
 }

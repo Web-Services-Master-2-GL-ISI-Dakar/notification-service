@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sn.ondmoney.notification.domain.NotificationLog;
 import sn.ondmoney.notification.repository.NotificationLogRepository;
@@ -20,18 +21,19 @@ public class NotificationEventConsumer implements Consumer<String> {
     private final NotificationLogRepository repository;
     private final NotificationEventProducer notificationEventProducer;
     private final ObjectMapper objectMapper;
-    private final NotificationLogSearchRepository notificationLogSearchRepository;
+    
+    // Elasticsearch est optionnel en dev
+    @Autowired(required = false)
+    private NotificationLogSearchRepository notificationLogSearchRepository;
 
     public NotificationEventConsumer(
         NotificationLogRepository repository,
         NotificationEventProducer notificationEventProducer,
-        ObjectMapper objectMapper,
-        NotificationLogSearchRepository notificationLogSearchRepository
+        ObjectMapper objectMapper
     ) {
         this.repository = repository;
         this.notificationEventProducer = notificationEventProducer;
         this.objectMapper = objectMapper;
-        this.notificationLogSearchRepository = notificationLogSearchRepository;
     }
 
     @Override
@@ -58,9 +60,13 @@ public class NotificationEventConsumer implements Consumer<String> {
             savedNtf = repository.save(tx);
             LOG.info("Notification saved successfully in MongoDB: {}", savedNtf.getEventRef());
 
-            // --- Index Notification in Elasticsearch ---
-            notificationLogSearchRepository.index(savedNtf);
-            LOG.info("Notification indexed successfully in Elasticsearch: {}", savedNtf.getEventRef());
+            // --- Index Notification in Elasticsearch (optionnel) ---
+            if (notificationLogSearchRepository != null) {
+                notificationLogSearchRepository.index(savedNtf);
+                LOG.info("Notification indexed successfully in Elasticsearch: {}", savedNtf.getEventRef());
+            } else {
+                LOG.debug("Elasticsearch not available, skipping indexing");
+            }
 
             // --- Publish success event ---
             NotificationLogDTO successEvent = new NotificationLogDTO();

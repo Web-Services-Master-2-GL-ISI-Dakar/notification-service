@@ -11,7 +11,6 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
@@ -24,7 +23,6 @@ import tech.jhipster.domain.util.JSR310DateConverters.ZonedDateTimeToDateConvert
 
 @Configuration
 @EnableMongock
-@EnableElasticsearchRepositories("sn.ondmoney.notification.repository.search")
 @EnableMongoRepositories(
     basePackages = "sn.ondmoney.notification.repository",
     includeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, value = MongoRepository.class)

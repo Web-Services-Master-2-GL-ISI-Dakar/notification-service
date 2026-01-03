@@ -32,9 +32,11 @@ lafrica-mobile:
 eureka:
   instance:
     prefer-ip-address: true
+    appname: ondmoneynotification
   client:
+    enabled: true
     service-url:
-      defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
+      defaultZone: http://admin:admin@localhost:8761/eureka/
 
 management:
   health:
@@ -48,6 +50,14 @@ management:
       probability: 1.0 # report 100% of traces
 
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+  docker:
+    compose:
+      enabled: false # Disable auto-start, use shared infra from start-infra.sh
   application:
     name: ondmoneyNotification
   mail:
@@ -123,6 +133,9 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/ondmoneyNotificationService
+    elasticsearch:
+      repositories:
+        enabled: false # Désactiver ES repositories en dev - Elasticsearch non requis
   elasticsearch:
     uris: http://localhost:9201
   messages:
@@ -131,7 +144,8 @@ spring:
     cache: false
 
 server:
-  port: 8081
+  # Port changé de 8081 à 8082 pour éviter le conflit avec transaction-engine-service
+  port: 8082
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
 
